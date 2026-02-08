@@ -1,0 +1,34 @@
+local statusURL = "https://raw.githubusercontent.com/cakiryagiz2014-boop/Zeroblox.lua/main/durum.txt"
+
+-- Menü oluşturma fonksiyonu
+local function LoadZeroblox()
+    local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+    local Window = Rayfield:CreateWindow({
+        Name = "Zeroblox v4.1 - Canlı Kontrol",
+        LoadingTitle = "Durum Kontrol Ediliyor...",
+        LoadingSubtitle = "by yagız",
+    })
+    
+    local MainTab = Window:CreateTab("Main", 4483362458)
+    MainTab:CreateLabel("Script şu an AKTİF!")
+end
+
+-- Kontrol Döngüsü
+spawn(function()
+    while true do
+        local currentStatus = game:HttpGet(statusURL)
+        
+        if currentStatus == "ACIK" then
+            print("Zeroblox Aktif!")
+            -- Eğer menü kapalıysa açması için buraya komut eklenebilir
+        elseif currentStatus == "KAPALI" then
+            -- Scripti durdur veya oyuncuyu uyar
+            game.Players.LocalPlayer:Kick("Script sahibi tarafından uzaktan kapatıldı!")
+            break
+        end
+        
+        task.wait(10) -- Her 10 saniyede bir GitHub'ı kontrol eder
+    end
+end)
+
+LoadZeroblox()
