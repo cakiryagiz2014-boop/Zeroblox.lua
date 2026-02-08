@@ -1,5 +1,6 @@
--- Zeroblox v4.1 - Full Functional Version
+-- Zeroblox v4.1 - Otomatik Sistem
 -- Owner: cakiryagiz2014-boop
+-- Bu kodu GitHub'daki Zeroblox.lua içine yapıştır.
 
 local success, err = pcall(function()
     if not game:IsLoaded() then game.Loaded:Wait() end
@@ -10,7 +11,7 @@ local success, err = pcall(function()
     
     local Window = Rayfield:CreateWindow({
         Name = "Zeroblox v4.1",
-        LoadingTitle = "Zeroblox PC Loaded",
+        LoadingTitle = "Zeroblox Sistemi Başlatılıyor...",
         LoadingSubtitle = "by yagız",
         ConfigurationSaving = { Enabled = true, FolderName = "ZerobloxConfig", FileName = "zeroblox.json" },
         KeySystem = false
@@ -18,21 +19,26 @@ local success, err = pcall(function()
     
     local MainTab = Window:CreateTab("Main", 4483362458)
     
-    -- --- ASIL FONKSİYONLAR BURADA BAŞLIYOR ---
+    -- --- FONKSİYONLAR ---
     
-    -- Speed (Hız) Fonksiyonu
-    local function setSpeed(value)
+    _G.WalkSpeed = 16
+    local function applySpeed()
         if player.Character and player.Character:FindFirstChild("Humanoid") then
-            player.Character.Humanoid.WalkSpeed = value
+            player.Character.Humanoid.WalkSpeed = _G.WalkSpeed
         end
     end
 
-    -- Fly (Uçma) Değişkenleri
+    -- Karakter her doğduğunda hızı tekrar uygula (Otomatik sistem)
+    player.CharacterAdded:Connect(function()
+        task.wait(1)
+        applySpeed()
+    end)
+
     local flying = false
     local function toggleFly(state)
         flying = state
         local char = player.Character
-        local hum = char:WaitForChild("Humanoid")
+        if not char then return end
         local root = char:WaitForChild("HumanoidRootPart")
         
         if flying then
@@ -42,11 +48,11 @@ local success, err = pcall(function()
             bv.Velocity = Vector3.new(0,0,0)
             
             task.spawn(function()
-                while flying do
+                while flying and root and bv.Parent do
                     bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 50
                     task.wait()
                 end
-                bv:Destroy()
+                if bv then bv:Destroy() end
             end)
         end
     end
@@ -54,18 +60,18 @@ local success, err = pcall(function()
     -- --- UI ELEMENTLERİ ---
 
     MainTab:CreateSlider({
-        Name = "WalkSpeed (Hız)",
+        Name = "Hız Ayarı",
         Range = {16, 300},
         Increment = 1,
-        Suffix = "Speed",
         CurrentValue = 16,
         Callback = function(Value)
-            setSpeed(Value)
+            _G.WalkSpeed = Value
+            applySpeed()
         end,
     })
 
     MainTab:CreateToggle({
-        Name = "Fly (Uçma)",
+        Name = "Uçuş Modu (Fly)",
         CurrentValue = false,
         Callback = function(Value)
             toggleFly(Value)
@@ -73,12 +79,12 @@ local success, err = pcall(function()
     })
 
     Rayfield:Notify({
-        Title = "Zeroblox Aktif!",
-        Content = "Tüm fonksiyonlar yüklendi.",
+        Title = "Sistem Hazır!",
+        Content = "Zeroblox başarıyla GitHub'dan çekildi.",
         Duration = 5
     })
 end)
 
 if not success then
-    warn("Hata: " .. tostring(err))
+    warn("Zeroblox Yükleme Hatası: " .. tostring(err))
 end
